@@ -1,9 +1,13 @@
+import os
+import json
+import subprocess
 from flask import Flask, render_template, request
+from flask_restx import Api, Resource
+
 
 app = Flask(__name__)
-# app.config.from_object(__name__)
+api = Api(app)
 
-@app.route('/')
 def welcome():
     return render_template('form.html')
 
@@ -31,33 +35,42 @@ def maximum(var_1, var_2):
 def degree(var_1, var_2):
     return var_1 ** var_2
 
-@app.route('/', methods=['POST'])
-def result():
-    var_1 = request.form.get("var_1", type=int, default=0)
-    var_2 = request.form.get("var_2", type=int, default=0)
-    operation = request.form.get("operation")
-
-    if operation == 'Addition':
-        result = add(var_1, var_2)
-    elif operation == 'Subtraction':
-        result = subtract(var_1, var_2)
-    elif operation == 'Multiplication':
-        result = multiply(var_1, var_2)
-    elif operation == 'Division':
-        result = divide(var_1, var_2)
-    elif operation == 'Minimum':
-        result = minimum(var_1, var_2)
-    elif operation == 'Maximum':
-        result = maximum(var_1, var_2)
-    elif operation == 'Degree':
-        result = degree(var_1, var_2)
-    else:
-        result = 0
-
-    entry = result
-    return render_template('form.html', entry=entry)
-    @app.route('/webhook', methods=['POST'])
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/calculator/', methods=['GET', 'POST'])
+def calculator():
+    result = None
+    if request.method == 'POST':
+        try:
+            num1 = float(request.form['num1'])
+            num2 = float(request.form['num2'])
+            operation = request.form['operation']
+            
+            # Отладочный вывод значений
+            print(f'num1: {num1}, num2: {num2}, operation: {operation}')
+            
+            operations = {
+                '+': add,
+                '-': subtract,
+                '*': multiply,
+                '/': divide,
+                '**': degree,
+                'max': maximum,
+                'min': minimum
+            }
+            
+            if operation in operations:
+                result = operations[operation](num1, num2)
+            else:
+                result = 'Ошибка: Неизвестная операция'
+        except ValueError:
+            result = 'Ошибка: Введите корректные числа'
     
+    # Отладочный вывод результата
+    print(f'Результат: {result}')
+    
+    return render_template('form.html', result=result)
+    
+@app.route('/webhook', methods=['POST'])    
 def webhook():
     data = request.get_json()
 
@@ -80,4 +93,4 @@ def webhook():
     
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5000,host='0.0.0.0')
