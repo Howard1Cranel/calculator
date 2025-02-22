@@ -8,33 +8,29 @@ from flask_restx import Api, Resource
 app = Flask(__name__)
 api = Api(app)
 
-def welcome():
-    return render_template('form.html')
+def add(number_1, number_2):
+    return number_1 + number_2
 
-def add(var_1, var_2):
-    return var_1 + var_2
+def subtract(number_1, number_2):
+    return number_1 - number_2
 
-def subtract(var_1, var_2):
-    return var_1 - var_2
+def multiply(number_1, number_2):
+    return number_1 * number_2
 
-def multiply(var_1, var_2):
-    return var_1 * var_2
+def divide(number_1, number_2):
+    if number_2 == 0:
+        return 'Ошибка: Деление на ноль'
+    return number_1 / number_2
 
-def divide(var_1, var_2):
-    if var_2 == 0:
-        return 0
-    else:
-        return var_1 / var_2
+def degree(number_1, number_2):
+    return number_1 ** number_2
 
-def minimum(var_1, var_2):
-    return min(var_1, var_2)
+def maximum(number_1, number_2):
+    return max(number_1, number_2)
 
-def maximum(var_1, var_2):
-    return max(var_1, var_2)
-
-def degree(var_1, var_2):
-    return var_1 ** var_2
-
+def minimum(number_1, number_2):
+    return min(number_1, number_2)
+    
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/calculator/', methods=['GET', 'POST'])
 def calculator():
@@ -69,7 +65,15 @@ def calculator():
     print(f'Результат: {result}')
     
     return render_template('form.html', result=result)
-    
+
+
+def execute(command):
+    process =subprocess.Popen(command, shell = True, executable="/bin/bash")
+    process.wait()
+    output, error = process.communicate()
+    return output
+
+
 @app.route('/webhook', methods=['POST'])    
 def webhook():
     data = request.get_json()
@@ -78,13 +82,13 @@ def webhook():
     with open('webhook.log', 'a') as f:
         formatted_data = json.dumps(data, indent=4, ensure_ascii=False)
         print(f'Received data: {formatted_data}', file=f)
-
+    url =data["repository"]["html_url"]
     # Директория, в которой расположен ваш сайт
     repo_dir = '/home/calculator'
-    
+    print(url)
     # Переходим в директорию репозитория и выполняем команду git pull
     try:
-        subprocess.run(['git', 'pull'], cwd=repo_dir, check=True)
+        execute(f"git pull {url}")
         print(f'Successfully updated repository in {repo_dir}')
     except subprocess.CalledProcessError as e:
         print(f'Error updating repository: {e}')
@@ -93,4 +97,4 @@ def webhook():
     
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000,host='0.0.0.0')
+    app.run(debug=True, port=5000, host='0.0.0.0')
