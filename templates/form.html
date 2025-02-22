@@ -2,34 +2,29 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Калькулятор</title>
 </head>
 <body>
-    <h1>Простой калькулятор</h1>
-
+    <h1>Калькулятор</h1>
     <form method="post">
-        <label for="var_1">Число 1:</label>
-        <input type="number" id="var_1" name="var_1" value="0"><br><br>
-
-        <label for="var_2">Число 2:</label>
-        <input type="number" id="var_2" name="var_2" value="0"><br><br>
-
-        <label for="operation">Операция:</label>
-        <select id="operation" name="operation">
-            <option value="Addition">Сложение</option>
-            <option value="Subtraction">Вычитание</option>
-            <option value="Multiplication">Умножение</option>
-            <option value="Division">Деление</option>
-            <option value="Minimum">Минимум</option>
-            <option value="Maximum">Максимум</option>
-            <option value="Degree">Степень</option>
-        </select><br><br>
-
-        <button type="submit">Вычислить</button>
+        <input type="number" name="num1" required step="any" placeholder="Введите число 1">
+        <select name="operation" required>
+            <option value="+">+</option>
+            <option value="-">-</option>
+            <option value="*">*</option>
+            <option value="/">/</option>
+            <option value="**">^</option>
+            <option value="max">Max</option>
+            <option value="min">Min</option>
+        </select>
+        <input type="number" name="num2" required step="any" placeholder="Введите число 2">
+        <button type="submit">Вычислить.... время9:42</button>
     </form>
-
-    {% if entry %}
-        <h2>Результат: {{ entry }}</h2>
+    
+    {% if result is not none %}
+        <h3>Результат: {{ result }}</h3>
+    {% else %}
+        <p>Результат не доступен. Пожалуйста, проверьте вводимые данные.</p>
     {% endif %}
 </body>
-</html>
