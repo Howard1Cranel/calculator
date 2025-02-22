@@ -1,6 +1,4 @@
 from flask import Flask, render_template, request
-from flask import request, render_template
-
 
 app = Flask(__name__)
 # app.config.from_object(__name__)
@@ -9,33 +7,31 @@ app = Flask(__name__)
 def welcome():
     return render_template('form.html')
 
-@app.route('/', methods=['POST'])
+def add(var_1, var_2):
+    return var_1 + var_2
 
+def subtract(var_1, var_2):
+    return var_1 - var_2
 
-def add(num1, num2):
-    return num1 + num2
+def multiply(var_1, var_2):
+    return var_1 * var_2
 
-def subtract(num1, num2):
-    return num1 - num2
-
-def multiply(num1, num2):
-    return num1 * num2
-
-def divide(num1, num2):
-    if num2 == 0:
+def divide(var_1, var_2):
+    if var_2 == 0:
         return 0
     else:
-        return num1 / num2
+        return var_1 / var_2
 
-def minimum(num1, num2):
-    return min(num1, num2)
+def minimum(var_1, var_2):
+    return min(var_1, var_2)
 
-def maximum(num1, num2):
-    return max(num1, num2)
+def maximum(var_1, var_2):
+    return max(var_1, var_2)
 
-def degree(num1, num2):
-    return num1 ** num2
+def degree(var_1, var_2):
+    return var_1 ** var_2
 
+@app.route('/', methods=['POST'])
 def result():
     var_1 = request.form.get("var_1", type=int, default=0)
     var_2 = request.form.get("var_2", type=int, default=0)
@@ -62,5 +58,4 @@ def result():
     return render_template('form.html', entry=entry)
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
-    
+    app.run(debug=True)
