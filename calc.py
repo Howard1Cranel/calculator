@@ -56,6 +56,28 @@ def result():
 
     entry = result
     return render_template('form.html', entry=entry)
+    @app.route('/webhook', methods=['POST'])
+    
+def webhook():
+    data = request.get_json()
+
+    # Логирование полученных данных в файл
+    with open('webhook.log', 'a') as f:
+        formatted_data = json.dumps(data, indent=4, ensure_ascii=False)
+        print(f'Received data: {formatted_data}', file=f)
+
+    # Директория, в которой расположен ваш сайт
+    repo_dir = '/home/calculator'
+    
+    # Переходим в директорию репозитория и выполняем команду git pull
+    try:
+        subprocess.run(['git', 'pull'], cwd=repo_dir, check=True)
+        print(f'Successfully updated repository in {repo_dir}')
+    except subprocess.CalledProcessError as e:
+        print(f'Error updating repository: {e}')
+
+    return 'Webhook received and update triggered', 200
+    
 
 if __name__ == '__main__':
     app.run(debug=True)
