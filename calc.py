@@ -2,11 +2,13 @@ import os
 import json
 import subprocess
 from flask import Flask, render_template, request
-from flask_restx import Api, Resource
+# from flask_restx import Api, Resource #Удаляем, так как не используем
 
+# Импортируем функции из webhook.py
+from webhook import setup_webhook_route
 
 app = Flask(__name__)
-api = Api(app)
+# api = Api(app) #Удаляем, так как не используем
 
 def add(number_1, number_2):
     return number_1 + number_2
@@ -67,34 +69,8 @@ def calculator():
     return render_template('form.html', result=result)
 
 
-def execute(command):
-    process =subprocess.Popen(command, shell = True, executable="/bin/bash")
-    process.wait()
-    output, error = process.communicate()
-    return output
-
-
-@app.route('/webhook', methods=['POST'])    
-def webhook():
-    data = request.get_json()
-
-    # Логирование полученных данных в файл
-    with open('webhook.log', 'a') as f:
-        formatted_data = json.dumps(data, indent=4, ensure_ascii=False)
-        print(f'Received data: {formatted_data}', file=f)
-    url =data["repository"]["html_url"]
-    # Директория, в которой расположен ваш сайт
-    repo_dir = '/home/calculator'
-    print(url)
-    # Переходим в директорию репозитория и выполняем команду git pull
-    try:
-        execute(f"git pull {url}")
-        print(f'Successfully updated repository in {repo_dir}')
-    except subprocess.CalledProcessError as e:
-        print(f'Error updating repository: {e}')
-
-    return 'Webhook received and update triggered', 200
-    
 
 if __name__ == '__main__':
+    # Настраиваем маршрут вебхука, передавая app
+    setup_webhook_route(app)
     app.run(debug=True, port=5000, host='0.0.0.0')
